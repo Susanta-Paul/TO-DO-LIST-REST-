@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Document</title>
+
+    <style>
+      
+    </style>
+    
+  </head>
+  <body>
+    <h1 style="text-decoration: underline">TO DO LIST </h1>
+    <h3> Your List </h3>
+    <ul id="list">
+    </ul>
+    <form id="first" method="post">
+      {% csrf_token %}
+      <input type="text" placeholder="add items" id="name" required>
+      <input type="submit" value="Add">
+    </form><br>
+    <form id="nice">
+      {% csrf_token %}
+      <input type="number" placeholder="Item Number" id="num" required>
+      <input type="submit" value="Delete">
+    </form>
+
+    <script>
+      let form=document.querySelector("#first");
+      let url="https://1c5ed89d-f30a-4bec-ac56-72d4e63ae86b-00-26ae947kpgaqd.sisko.replit.dev/all";
+      let list=document.querySelector("#list")
+
+      fetch(url)
+      .then((response)=>{return response.json()})
+      .then((value)=>{
+        console.log(value)
+        value.forEach((item)=>{
+          let ok= document.createElement("li");
+          // ok.innerText=item["item"];
+          ok.innerHTML= `${item["id"]}) ${item["item"]}`;
+          list.append(ok);
+        })
+      })
+
+      if(form){
+        form.addEventListener("submit", (event)=>{
+          event.preventDefault();
+          let task=document.querySelector("#name");
+          const data={
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{csrf_token}}"
+            },
+            body: JSON.stringify({
+              "item": task.value
+              })
+          }
+          task.value=""
+          fetch(url,data)
+          .then((response)=>{return response.json()})
+          .then((value)=>{
+            let ok= document.createElement("li");
+            ok.innerHTML=`${value["id"]}) ${value["item"]}`;
+            list.append(ok);
+          })
+          
+        })
+      }
+
+      let del=document.querySelector("#nice");
+      let num=document.querySelector("#num");
+      
+
+      if(del){
+        del.addEventListener("submit",(event)=>{
+          let newurl=`https://1c5ed89d-f30a-4bec-ac56-72d4e63ae86b-00-26ae947kpgaqd.sisko.replit.dev/all/${num.value}`;
+          console.log(newurl)
+          all={
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{csrf_token}}"
+            },
+            // body:JSON.stringify({"id": num.value})
+          }
+
+          fetch(newurl, all)
+          .then((response)=>{console.log(response)})
+          .catch((error)=>{console.error(error)})
+        })
+      }
+
+    
+    </script>
+  </body>
+</html>
+  
